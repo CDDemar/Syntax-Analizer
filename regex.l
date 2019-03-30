@@ -6,9 +6,8 @@
 
 int _lineno = 1;
 int token_index = 0;
-void printVal(){
-}
-
+char tokens[10000];
+char errs[100000];
 %}
 
 DIGITO		[0-9]
@@ -58,21 +57,38 @@ ID		{LETRA}{ALFA}*
 "while"		{ printf(" MIENTRAS QUE "); }
 "switch"	{ printf(" DEPENDIENDO DE "); }
 {CADENA}	{ printf(" cte-cadena= %s ", yytext); }
-{ID}		{ printf(" ID= %s ", yytext); }
+{ID}		{ 
+			printf(" ID: %s ", yytext);			
+			char *result = malloc(strlen("ID: ") +strlen(yytext) +strlen("\t") +1);
+			strcpy(result, "ID: ");
+			strcat(result, yytext);
+			strcat(result, "\t");
+			if(!strstr(tokens, result)){
+				strcat(tokens, result);			
+			}
+		}
 {REAL}		{ printf(" cte-real= %s ", yytext); }
 {NUMERO}	{ printf(" cte-entero= %s ", yytext); }
 ";"		{ printf(" punto-coma= ; "); }
 ","		{ printf(" coma= , "); }
 "\."		{ printf(" punto= ."); }
 [ ]		;
-"\n"		{ printVal(); printf("\n"); ++_lineno; }
-.		{ printf("\nERROR EN LINEA %d, EN %s\n", _lineno, yytext); ++_lineno; }
+"\n"		{ printf("\n"); ++_lineno; }
+.		{ 
+			printf("\nERROR EN LINEA %d, EN %s\n", _lineno, yytext); 
+			char str[12];
+			sprintf(str, "%d", _lineno);
+			char* result = malloc(strlen("\tERROR EN LINEA ") +strlen(str) +strlen(", EN ") +strlen(yytext) +strlen("\n") +1);
+			strcpy(result, "\tERROR EN LINEA ");
+			strcat(result, str);
+			strcat(result, ", EN ");
+			strcat(result, yytext);
+			strcat(result, "\n");
+			strcat(errs, result);		
+			++_lineno; 
+		}
 %%
 int main(int argc, char *argv[]){
-	char **tokens = calloc(10, sizeof(char*));
-	for(int i = 0; i < 10; i++){
-		tokens[i] = calloc(1, sizeof(char) *100);
-	}
 	if(tokens != NULL){
 		printf("Memory allocated!");
 	}
@@ -83,5 +99,7 @@ int main(int argc, char *argv[]){
 		yyin = stdin;	
 	}
 	yylex();
+	printf("\n\nIDENTIFICADORES\n%s", tokens);
+	printf("\n\nERRORES:\n%s", errs);
 	return 0;
 }
