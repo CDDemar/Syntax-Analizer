@@ -1,7 +1,14 @@
 %{
-#include<stdio.h>
-#include<math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>		
+#include <math.h>
+
 int _lineno = 1;
+int token_index = 0;
+void printVal(){
+}
+
 %}
 
 DIGITO		[0-9]
@@ -18,30 +25,57 @@ ID		{LETRA}{ALFA}*
 "("		{ printf("parent-a= ( "); }
 "void"		{ printf(" VOID "); }
 ")"		{ printf(" parent-c= ) "); }
-"{"		{ printf("inicio= { "); ++_lineno; }
+"{"		{ printf("inicio= { "); }
 "}"		{ printf("fin= } "); ++_lineno; }
+"["		{ printf(" corch-a= [ "); }
+"]"		{ printf(" corch-c= ] "); }
 "int"		{ printf(" ENTERO "); }
 "float"		{ printf(" REAL "); }
 "char"		{ printf(" CARACTER "); }
 "printf"	{ printf(" ESCRIBIR "); }
 "scanf"		{ printf(" LEER "); }
-"="		{ printf(" op-igual= ="); }
+"<--"		{ printf(" op-asign= <--"); }
 "+" 		{ printf(" op-sum= + "); }
-"-" 		{ printf(" op-subs= - "); }
+"-" 		{ printf(" op-sust= - "); }
 "*" 		{ printf(" op-mult= * "); }
 "/" 		{ printf(" op-div= / "); }
 "^" 		{ printf(" op-exp= ^ "); }
+"="		{ printf(" op-igual= ="); }
+"<="		{ printf(" op-men-ig= <= "); }
+">="		{ printf(" op-may-ig= >= "); }
+"<>"		{ printf(" op-difer= <> "); }
+">"		{ printf(" op-mayor= > "); }
+"<"		{ printf(" op-menor= < "); } 
+"=="		{ printf(" op-comp= == "); }
+"y"		{ printf(" op-y= y "); }
+"o"		{ printf(" op-o= o"); }
+"~"		{ printf(" op-no= ~"); }
+"true"		{ printf(" op-ver= true"); }
+"false" 	{ printf(" op-fal= false"); }
+"if"		{ printf(" SI "); }
+"else"		{ printf(" SINO "); }
+"for"		{ printf(" PARA "); }
+"while"		{ printf(" MIENTRAS QUE "); }
+"switch"	{ printf(" DEPENDIENDO DE "); }
 {CADENA}	{ printf(" cte-cadena= %s ", yytext); }
 {ID}		{ printf(" ID= %s ", yytext); }
 {REAL}		{ printf(" cte-real= %s ", yytext); }
 {NUMERO}	{ printf(" cte-entero= %s ", yytext); }
-";"		{ printf(" punto-coma= ; "); ++_lineno;}
-","		{ printf(" coma= , ");}
+";"		{ printf(" punto-coma= ; "); }
+","		{ printf(" coma= , "); }
+"\."		{ printf(" punto= ."); }
 [ ]		;
-"\n"		{printf("\n"); ++_lineno;}
-.		{ printf("\nERROR EN LINEA %d, EN %s\n", _lineno, yytext); ++_lineno;}
+"\n"		{ printVal(); printf("\n"); ++_lineno; }
+.		{ printf("\nERROR EN LINEA %d, EN %s\n", _lineno, yytext); ++_lineno; }
 %%
 int main(int argc, char *argv[]){
+	char **tokens = calloc(10, sizeof(char*));
+	for(int i = 0; i < 10; i++){
+		tokens[i] = calloc(1, sizeof(char) *100);
+	}
+	if(tokens != NULL){
+		printf("Memory allocated!");
+	}
 	++argv, --argc;
 	if(argc > 0){
 		yyin = fopen(argv[0], "r");
