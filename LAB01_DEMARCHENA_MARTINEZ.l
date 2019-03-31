@@ -5,8 +5,9 @@
 #include <math.h>
 
 int _lineno = 1;
-int token_index = 0;
+int token_count = 0;
 char tokens[10000];
+int err_count = 0;
 char errs[100000];
 %}
 
@@ -59,12 +60,13 @@ ID		{LETRA}{ALFA}*
 {CADENA}	{ printf(" cte-cadena= %s ", yytext); }
 {ID}		{ 
 			printf(" ID: %s ", yytext);			
-			char *result = malloc(strlen("ID: ") +strlen(yytext) +strlen("\t") +1);
+			char *result = malloc(strlen("ID: ") +strlen(yytext) +strlen(";  ") +1);
 			strcpy(result, "ID: ");
 			strcat(result, yytext);
 			strcat(result, "\t");
 			if(!strstr(tokens, result)){
-				strcat(tokens, result);			
+				strcat(tokens, result);	
+				token_count++;	
 			}
 		}
 {REAL}		{ printf(" cte-real= %s ", yytext); }
@@ -84,7 +86,8 @@ ID		{LETRA}{ALFA}*
 			strcat(result, ", EN ");
 			strcat(result, yytext);
 			strcat(result, "\n");
-			strcat(errs, result);		
+			strcat(errs, result);
+			err_count++;		
 			++_lineno; 
 		}
 %%
@@ -99,7 +102,7 @@ int main(int argc, char *argv[]){
 		yyin = stdin;	
 	}
 	yylex();
-	printf("\n\nIDENTIFICADORES\n%s", tokens);
-	printf("\n\nERRORES:\n%s", errs);
+	printf("\n\nIDENTIFICADORES\n--HAY %d IDENTIFICADORES--\n%s", token_count, tokens);
+	printf("\n\nERRORES:\n--HAY %d ERRORRES--\n%s", err_count, errs);
 	return 0;
 }
